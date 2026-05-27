@@ -36,9 +36,10 @@ export async function GET() {
     const pdfBuffer = await fileRes.arrayBuffer();
 
     await put('document.pdf', pdfBuffer, {
-      access: 'public',
-      allowOverwrite: true,
-      contentType: 'application/pdf',
+        access: 'public',
+        allowOverwrite: true,
+        contentType: 'application/pdf',
+        token: process.env.BLOB_READ_WRITE_TOKEN,
     });
 
     return new Response('✅ PDF converted and stored successfully!', { status: 200 });
