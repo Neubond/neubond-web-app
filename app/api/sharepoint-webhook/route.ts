@@ -2,7 +2,7 @@ import { put } from '@vercel/blob';
 import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  // SharePoint validation handshake
+  // Validation handshake
   const validationToken = request.nextUrl.searchParams.get('validationToken');
   if (validationToken) {
     return new Response(validationToken, {
@@ -11,7 +11,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // Step 1 — Get Azure access token
+    const body = await request.json();
+
+    // Get access token
     const tokenRes = await fetch(
       `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/oauth2/v2.0/token`,
       {
@@ -27,26 +29,41 @@ export async function POST(request: NextRequest) {
     );
     const { access_token } = await tokenRes.json();
 
-    // Step 2 — Fetch Word file from SharePoint and convert to PDF
-    const filePath = "0. QMS/1. DHF Loop I/3. Phase III - Design Outputs/IFU & Labels (manufacturer information)/NBD-LP1-IFU-001 Rev 01 Neubond IFU.docx";
+    // Get the changed items
+    const changedItems = body.value || [];
     
+    for (const notification of changedItems) {
+      // Get the actual changes
+      const changesRes = await fetch(
+        `https://graph.microsoft.com/v1.0/drives/${process.env.SHAREPOINT_DRIVE_ID}/items/${process.env.SHAREPOINT_FILE_ID}`,
+        {
+          headers: { Authorization: `Bearer ${access_token}` }
+        }
+      );
+      const fileData = await changesRes.json();
+
+      // Check if our specific file was modified
+      // Compare last modified time with what we last processed
+      const lastModified = new Date(fileData.lastModifiedDateTime).getTime();
+      const lastProcessed = parseInt(process.env.LAST_PROCESSED || '0');
+
+      if (lastModified <= lastProcessed) {
+        console.log('File not changed, skipping');
+        return new Response('OK', { status: 200 });
+      }
+    }
+
+    // Our file changed — convert and upload
     const fileRes = await fetch(
-      `https://graph.microsoft.com/v1.0/drives/b!r3RlGcbS5kakGaO6-Xf3r6BZRHN6UiNOiGRGWaW1cFReOUKxLVzFQI95Vg1r9A1L/root:/${encodeURIComponent(filePath)}:/content?format=pdf`,
+      `https://graph.microsoft.com/v1.0/drives/${process.env.SHAREPOINT_DRIVE_ID}/items/${process.env.SHAREPOINT_FILE_ID}/content?format=pdf`,
       {
         headers: { Authorization: `Bearer ${access_token}` }
       }
     );
 
-    if (!fileRes.ok) {
-      const error = await fileRes.text();
-      console.error('SharePoint fetch error:', error);
-      return new Response('Failed to fetch file', { status: 500 });
-    }
-
     const pdfBuffer = await fileRes.arrayBuffer();
 
-    // Step 3 — Store in Vercel Blob
-    await put('document.pdf', pdfBuffer, {
+    await put('Instruction for use - Neubond.pdf', pdfBuffer, {
       access: 'private',
       allowOverwrite: true,
       contentType: 'application/pdf',
