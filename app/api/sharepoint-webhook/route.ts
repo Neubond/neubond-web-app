@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Step 3 — Store in Vercel Blob
     await put('document.pdf', pdfBuffer, {
-      access: 'public',
+      access: 'private',
       allowOverwrite: true,
       contentType: 'application/pdf',
       token: process.env.BLOB_READ_WRITE_TOKEN,

@@ -36,7 +36,7 @@ export async function GET() {
     const pdfBuffer = await fileRes.arrayBuffer();
 
     await put('document.pdf', pdfBuffer, {
-        access: 'public',
+        access: 'private',
         allowOverwrite: true,
         contentType: 'application/pdf',
         token: process.env.BLOB_READ_WRITE_TOKEN,
