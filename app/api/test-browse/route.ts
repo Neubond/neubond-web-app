@@ -15,16 +15,23 @@ export async function GET() {
     );
     const { access_token } = await tokenRes.json();
 
-    // List root contents
+    // Browse inside 0. QMS using its item ID
     const res = await fetch(
-      `https://graph.microsoft.com/v1.0/drives/${process.env.SHAREPOINT_DRIVE_ID}/root/children`,
+      `https://graph.microsoft.com/v1.0/drives/${process.env.SHAREPOINT_DRIVE_ID}/items/01G6J3RA3IVQVVEIU4WBELJK4VYOCZAP5F/children`,
       {
         headers: { Authorization: `Bearer ${access_token}` }
       }
     );
     const data = await res.json();
 
-    return new Response(JSON.stringify(data, null, 2), {
+    // Just return names
+    const items = data.value?.map((item: any) => ({
+      name: item.name,
+      id: item.id,
+      type: item.folder ? 'folder' : 'file',
+    }));
+
+    return new Response(JSON.stringify(items, null, 2), {
       headers: { 'Content-Type': 'application/json' }
     });
 
