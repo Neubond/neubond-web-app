@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     const pdfBuffer = await fileRes.arrayBuffer();
 
-    await put('Instruction for use - Neubond.pdf', pdfBuffer, {
+    await put('document.pdf', pdfBuffer, {
       access: 'private',
       allowOverwrite: true,
       contentType: 'application/pdf',
