@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "com.nabeel.neubond2",
       "sha256_cert_fingerprints": [
-        "3D:90:E2:EE:DC:C1:F2:77:53:8A:A6:B9:BC:4C:5B:72:67:AF:D6:8A:B5:2B:9A:CA:0C:F7:B6:52:89:92:51:9D"
+        "3D:90:E2:EE:DC:C1:F2:77:53:8A:A6:B9:BC:4C:5B:72:67:AF:D6:8A:B5:2B:9A:CA:0C:F7:B6:52:89:92:51:9D",
+        "84:EB:99:4D:1C:C5:F3:5B:EE:56:27:F7:91:1C:DF:F9:5D:A6:9E:F8:23:DC:2D:0F:E3:FD:87:2F:A7:77:D6:45"
       ]
     }
   },
