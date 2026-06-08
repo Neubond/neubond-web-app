@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import { get } from "@vercel/blob";
+import { head } from "@vercel/blob";
 import { createClient } from "@/lib/supabase/server";
 
 const NOINDEX = "noindex, nofollow";
@@ -25,25 +25,37 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const result = await get(file, {
-    access: "private",
-    token: process.env.BLOB_READ_WRITE_TOKEN,
-  });
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
 
-  if (!result || result.statusCode !== 200) {
+  const blobMeta = await head(file, { token }).catch(() => null);
+
+  if (!blobMeta) {
     return new Response("File not found.", {
       status: 404,
       headers: { "X-Robots-Tag": NOINDEX },
     });
   }
 
+  const upstream = await fetch(blobMeta.url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!upstream.ok) {
+    return new Response("File not found.", {
+      status: 404,
+      headers: { "X-Robots-Tag": NOINDEX },
+    });
+  }
+
+  const buffer = await upstream.arrayBuffer();
   const label = labelFor(file);
 
-  return new Response(result.stream, {
+  return new Response(buffer, {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename="IFU-${label}.pdf"`,
+      "Content-Length": buffer.byteLength.toString(),
       "X-Robots-Tag": NOINDEX,
       "Cache-Control": "no-store",
     },

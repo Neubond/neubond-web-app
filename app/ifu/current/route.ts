@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import { list, get } from "@vercel/blob";
+import { list } from "@vercel/blob";
 import { createClient } from "@/lib/supabase/server";
 
 const NOINDEX = "noindex, nofollow";
@@ -16,10 +16,9 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const { blobs } = await list({
-    prefix: "ifu/",
-    token: process.env.BLOB_READ_WRITE_TOKEN,
-  });
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+
+  const { blobs } = await list({ prefix: "ifu/", token });
 
   const versions = blobs
     .filter((b) => b.pathname.endsWith(".pdf"))
@@ -36,25 +35,27 @@ export async function GET(request: NextRequest) {
   }
 
   const current = versions[0];
-  const result = await get(current.pathname, {
-    access: "private",
-    token: process.env.BLOB_READ_WRITE_TOKEN,
+
+  const upstream = await fetch(current.url, {
+    headers: { Authorization: `Bearer ${token}` },
   });
 
-  if (!result || result.statusCode !== 200) {
+  if (!upstream.ok) {
     return new Response("IFU file not found.", {
       status: 404,
       headers: { "X-Robots-Tag": NOINDEX },
     });
   }
 
+  const buffer = await upstream.arrayBuffer();
   const label = labelFor(current.pathname);
 
-  return new Response(result.stream, {
+  return new Response(buffer, {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `inline; filename="IFU-${label}.pdf"`,
+      "Content-Length": buffer.byteLength.toString(),
       "X-Robots-Tag": NOINDEX,
       "Cache-Control": "no-store",
     },
