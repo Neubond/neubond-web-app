@@ -55,9 +55,12 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith("/ifu") &&
     !request.nextUrl.pathname.startsWith("/api/ifu")
   ) {
-    // no user, potentially respond by redirecting the user to the login page
+    // no user, redirect to login and carry the original destination so we can
+    // send them back there after a successful sign-in.
     const url = request.nextUrl.clone();
+    const redirectTo = request.nextUrl.pathname + request.nextUrl.search;
     url.pathname = "/auth/login";
+    url.search = `?redirectTo=${encodeURIComponent(redirectTo)}`;
     return NextResponse.redirect(url);
   }
 
