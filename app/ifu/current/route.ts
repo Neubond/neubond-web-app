@@ -8,6 +8,8 @@ const labelFor = (pathname: string) =>
   pathname.replace(/^ifu\//, "").replace(/\.pdf$/, "");
 
 export async function GET(request: NextRequest) {
+  let supabaseForSignOut: Awaited<ReturnType<typeof createClient>> | null = null;
+
   if (process.env.IFU_REQUIRE_AUTH === "true") {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.getClaims();
@@ -16,6 +18,7 @@ export async function GET(request: NextRequest) {
       loginUrl.searchParams.set("redirectTo", request.nextUrl.pathname);
       return Response.redirect(loginUrl);
     }
+    supabaseForSignOut = supabase;
   }
 
   const token = process.env.BLOB_READ_WRITE_TOKEN;
@@ -51,6 +54,10 @@ export async function GET(request: NextRequest) {
 
   const buffer = await upstream.arrayBuffer();
   const label = labelFor(current.pathname);
+
+  if (supabaseForSignOut) {
+    await supabaseForSignOut.auth.signOut();
+  }
 
   return new Response(buffer, {
     status: 200,
