@@ -20,7 +20,8 @@ async function PublishContent() {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
 
-  if (error || !data?.claims) redirect("/auth/login");
+  if (error || !data?.claims)
+    redirect(`/auth/login?redirectTo=${encodeURIComponent("/ifu/publish")}`);
   if (!isAuthorizedPublisher(data.claims.email)) redirect("/auth/login");
 
   return (

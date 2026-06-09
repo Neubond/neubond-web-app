@@ -12,7 +12,9 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.getClaims();
     if (error || !data?.claims) {
-      return Response.redirect(new URL("/auth/login", request.url));
+      const loginUrl = new URL("/auth/login", request.url);
+      loginUrl.searchParams.set("redirectTo", request.nextUrl.pathname);
+      return Response.redirect(loginUrl);
     }
   }
 
