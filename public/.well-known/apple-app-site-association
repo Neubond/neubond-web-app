@@ -9,7 +9,7 @@
           "ZLAN24X259.com.neubond.neubondresearch"
         ],
         "paths": [
-          "*"
+          "/auth/confirm"
         ]
       }
     ]
