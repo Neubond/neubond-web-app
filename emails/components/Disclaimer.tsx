@@ -1,5 +1,5 @@
 // /emails/components/Disclaimer.tsx
-import { Section } from "@react-email/components";
+import { Section } from "react-email";
 
 export default function Disclaimer() {
   return (

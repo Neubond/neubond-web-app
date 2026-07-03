@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "composite": false,
@@ -14,7 +18,8 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react-jsx",
+    "noUncheckedSideEffectImports": false,
+    "jsx": "preserve",
     "incremental": true,
     "plugins": [
       {
@@ -22,7 +27,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
@@ -33,5 +40,8 @@
     ".next/dev/types/**/*.ts",
     "emails/tailwind.config.js"
   ],
-  "exclude": ["node_modules", "supabase"]
+  "exclude": [
+    "node_modules",
+    "supabase"
+  ]
 }

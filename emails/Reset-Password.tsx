@@ -5,7 +5,7 @@ import {
   Img,
   Button,
   Preview,
-} from "@react-email/components";
+} from "react-email";
 
 import Footer from "./components/Footer";
 import Logo from "./components/Logo";

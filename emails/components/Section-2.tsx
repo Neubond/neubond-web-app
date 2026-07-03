@@ -1,5 +1,5 @@
 // /emails/components/LookingAheadSection.tsx
-import { Section, Img } from "@react-email/components";
+import { Section, Img } from "react-email";
 
 export default function Section2() {
   return (

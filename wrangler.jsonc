@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "neubond-reset-password",
+  "compatibility_date": "2026-07-03",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "neubond-reset-password"
+    }
+  ],
+  "images": {
+    "binding": "IMAGES"
+  },
+  // Create this bucket first: `wrangler r2 bucket create neubond-reset-password-cache`
+  // Required for ISR/Cache Components revalidation to persist across requests.
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "neubond-reset-password-cache"
+    }
+  ]
+}

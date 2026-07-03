@@ -1,4 +1,4 @@
-import { Section, Row, Column } from "@react-email/components";
+import { Section, Row, Column } from "react-email";
 
 export default function TopBar() {
   return (

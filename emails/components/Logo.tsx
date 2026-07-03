@@ -1,5 +1,5 @@
 // /emails/components/Logo.tsx
-import { Section, Img, Link } from "@react-email/components";
+import { Section, Img, Link } from "react-email";
 import { Props, ScriptProps } from "next/script";
 
 export default function Logo({ width }: { width: string }) {

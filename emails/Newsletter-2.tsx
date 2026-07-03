@@ -1,4 +1,4 @@
-import { Body, Container, Head, Html, Preview } from "@react-email/components";
+import { Body, Container, Head, Html, Preview } from "react-email";
 
 import TopBar from "./components/TopBar";
 import Logo from "./components/Logo";

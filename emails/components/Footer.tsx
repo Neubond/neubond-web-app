@@ -1,5 +1,5 @@
 // /emails/components/Footer.tsx
-import { Section, Img, Link, Row, Column } from "@react-email/components";
+import { Section, Img, Link, Row, Column } from "react-email";
 
 export default function Footer() {
   return (

@@ -1,0 +1,14 @@
+# Copy to .dev.vars and fill in for `npm run preview` (wrangler/OpenNext local preview).
+# Same values as .env.local — wrangler doesn't read .env files, only .dev.vars.
+
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
+
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_...
+
+RESEND_API_KEY=re_...
+SEND_EMAIL_HOOK_SECRET=v1,whsec_...
+SENDER_EMAIL=Neubond <info@example.com>
+
+IFU_PUBLISHER_EMAILS=publisher@example.com,admin@example.com
+# IFU_REQUIRE_AUTH=true

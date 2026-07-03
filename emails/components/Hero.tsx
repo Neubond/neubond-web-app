@@ -1,5 +1,5 @@
 // /emails/components/Hero.tsx
-import { Section, Img } from "@react-email/components";
+import { Section, Img } from "react-email";
 
 export default function Hero() {
   return (

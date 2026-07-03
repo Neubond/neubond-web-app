@@ -1,6 +1,5 @@
 "use client";
 
-import { GalleryVerticalEnd } from "lucide-react";
 import { UpdatePasswordForm } from "@/components/update-password-form";
 import { AppPreview } from "@/components/app-preview";
 import Image from "next/image";

@@ -6,7 +6,7 @@ import {
   Img,
   Link,
   Container,
-} from "@react-email/components";
+} from "react-email";
 
 export default function SocialBlock() {
   return (
