@@ -5,7 +5,7 @@ export default function Hero() {
   return (
     <Section>
       <Img
-        src="https://app.neubond.co.uk/email/Newsletter-2/Team_edited.jpg"
+        src="https://app.neubond.co.uk/email/Newsletter-3/Hero.jpeg"
         width="100%"
         alt="Welcome to Neubond Hero"
         style={{
