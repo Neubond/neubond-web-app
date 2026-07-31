@@ -10,6 +10,19 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get("next") ?? "/";
 
   if (token_hash && type) {
+    // For password recovery, don't consume the token here. Merely opening the
+    // link (real clicks, refreshes, or email security scanners prefetching the
+    // URL) would otherwise burn the single-use token before the user gets to
+    // set a new password. Forward the token to the update-password page and let
+    // it verify the OTP at save time instead.
+    if (type === "recovery") {
+      redirect(
+        `/auth/update-password?token_hash=${encodeURIComponent(
+          token_hash,
+        )}&type=recovery`,
+      );
+    }
+
     const supabase = await createClient();
 
     const { error } = await supabase.auth.verifyOtp({
