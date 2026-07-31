@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { GalleryVerticalEnd } from "lucide-react";
 import { UpdatePasswordForm } from "@/components/update-password-form";
 import { AppPreview } from "@/components/app-preview";
@@ -30,7 +31,9 @@ export default function UpdatePasswordPage() {
         {/* Form container */}
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <UpdatePasswordForm />
+            <Suspense fallback={null}>
+              <UpdatePasswordForm />
+            </Suspense>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -110,6 +111,11 @@ export function UpdatePasswordForm({
 }: React.ComponentPropsWithoutRef<"form">) {
   const supabase = createClient();
 
+  // Recovery token forwarded (unconsumed) from /auth/confirm. We verify it only
+  // when the user saves, so merely opening this page never burns the token.
+  const searchParams = useSearchParams();
+  const tokenHash = searchParams.get("token_hash");
+
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
 
@@ -157,6 +163,16 @@ export function UpdatePasswordForm({
     setIsLoading(true);
 
     try {
+      // Consume the recovery token now (at save time), then set the password.
+      // This is what actually expires the email link — not just opening it.
+      if (tokenHash) {
+        const { error: otpError } = await supabase.auth.verifyOtp({
+          type: "recovery",
+          token_hash: tokenHash,
+        });
+        if (otpError) throw otpError;
+      }
+
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
 
