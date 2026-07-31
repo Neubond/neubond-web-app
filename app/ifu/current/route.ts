@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import { list } from "@vercel/blob";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createClient } from "@/lib/supabase/server";
 
 const NOINDEX = "noindex, nofollow";
@@ -21,16 +21,12 @@ export async function GET(request: NextRequest) {
     supabaseForSignOut = supabase;
   }
 
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const { env } = getCloudflareContext();
 
-  const { blobs } = await list({ prefix: "ifu/", token });
-
-  const versions = blobs
-    .filter((b) => b.pathname.endsWith(".pdf"))
-    .sort(
-      (a, b) =>
-        new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime(),
-    );
+  const { objects } = await env.IFU_BUCKET.list({ prefix: "ifu/" });
+  const versions = objects
+    .filter((o) => o.key.endsWith(".pdf"))
+    .sort((a, b) => b.uploaded.getTime() - a.uploaded.getTime());
 
   if (versions.length === 0) {
     return new Response("No IFU version has been published yet.", {
@@ -40,20 +36,17 @@ export async function GET(request: NextRequest) {
   }
 
   const current = versions[0];
+  const object = await env.IFU_BUCKET.get(current.key);
 
-  const upstream = await fetch(current.url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (!upstream.ok) {
+  if (!object) {
     return new Response("IFU file not found.", {
       status: 404,
       headers: { "X-Robots-Tag": NOINDEX },
     });
   }
 
-  const buffer = await upstream.arrayBuffer();
-  const label = labelFor(current.pathname);
+  const buffer = await object.arrayBuffer();
+  const label = labelFor(current.key);
 
   if (supabaseForSignOut) {
     await supabaseForSignOut.auth.signOut();

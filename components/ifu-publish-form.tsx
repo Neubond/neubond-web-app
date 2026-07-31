@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { upload } from "@vercel/blob/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,15 +32,34 @@ export function IFUPublishForm() {
     setProgress(0);
     setErrorMessage("");
 
+    const body = new FormData();
+    body.set("label", label);
+    body.set("file", file);
+
     try {
-      const blob = await upload(`ifu/${label}.pdf`, file, {
-        access: "private",
-        handleUploadUrl: "/api/ifu/upload",
-        clientPayload: label,
-        multipart: true,
-        onUploadProgress: ({ percentage }) => setProgress(percentage),
+      const { pathname } = await new Promise<{ pathname: string }>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/ifu/upload");
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) setProgress(Math.round((e.loaded / e.total) * 100));
+        };
+        xhr.onload = () => {
+          let json: { pathname?: string; error?: string } = {};
+          try {
+            json = JSON.parse(xhr.responseText);
+          } catch {
+            // ignore parse failure, handled by status check below
+          }
+          if (xhr.status >= 200 && xhr.status < 300 && json.pathname) {
+            resolve({ pathname: json.pathname });
+          } else {
+            reject(new Error(json.error ?? "Upload failed."));
+          }
+        };
+        xhr.onerror = () => reject(new Error("Upload failed."));
+        xhr.send(body);
       });
-      setResultPathname(blob.pathname);
+      setResultPathname(pathname);
       setStatus("success");
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : "Upload failed.");

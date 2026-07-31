@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import { head } from "@vercel/blob";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createClient } from "@/lib/supabase/server";
 
 const NOINDEX = "noindex, nofollow";
@@ -30,29 +30,17 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  const { env } = getCloudflareContext();
+  const object = await env.IFU_BUCKET.get(file);
 
-  const blobMeta = await head(file, { token }).catch(() => null);
-
-  if (!blobMeta) {
+  if (!object) {
     return new Response("File not found.", {
       status: 404,
       headers: { "X-Robots-Tag": NOINDEX },
     });
   }
 
-  const upstream = await fetch(blobMeta.url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (!upstream.ok) {
-    return new Response("File not found.", {
-      status: 404,
-      headers: { "X-Robots-Tag": NOINDEX },
-    });
-  }
-
-  const buffer = await upstream.arrayBuffer();
+  const buffer = await object.arrayBuffer();
   const label = labelFor(file);
 
   return new Response(buffer, {

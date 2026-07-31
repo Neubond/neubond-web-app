@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { connection } from "next/server";
-import { list } from "@vercel/blob";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -33,17 +33,13 @@ async function IFUVersionList() {
       redirect(`/auth/login?redirectTo=${encodeURIComponent("/ifu")}`);
   }
 
-  const { blobs } = await list({
-    prefix: "ifu/",
-    token: process.env.BLOB_READ_WRITE_TOKEN,
-  });
+  const { env } = getCloudflareContext();
+  const { objects } = await env.IFU_BUCKET.list({ prefix: "ifu/" });
 
-  const versions = blobs
-    .filter((b) => b.pathname.endsWith(".pdf"))
-    .sort(
-      (a, b) =>
-        new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime(),
-    );
+  const versions = objects
+    .filter((o) => o.key.endsWith(".pdf"))
+    .map((o) => ({ pathname: o.key, uploadedAt: o.uploaded }))
+    .sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime());
 
   if (versions.length === 0) {
     return <p className="text-sm text-neutral-500">No versions published yet.</p>;

@@ -1,7 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
-  "name": "neubond-reset-password",
+  "name": "neubond-web-app",
+  "account_id": "b4d0e8b5ddd0516bbcc5da3850fabc2e",
   "compatibility_date": "2026-07-03",
   "compatibility_flags": [
     "nodejs_compat",
@@ -14,18 +15,20 @@
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "neubond-reset-password"
+      "service": "neubond-web-app"
     }
   ],
   "images": {
     "binding": "IMAGES"
   },
-  // Create this bucket first: `wrangler r2 bucket create neubond-reset-password-cache`
-  // Required for ISR/Cache Components revalidation to persist across requests.
+  // IFU_BUCKET stores published IFU PDF versions.
+  // Create it first: `wrangler r2 bucket create neubond-ifu-documents`
+  // (No NEXT_INC_CACHE_R2_BUCKET: incremental cache is disabled in
+  // open-next.config.ts since this app has no ISR routes.)
   "r2_buckets": [
     {
-      "binding": "NEXT_INC_CACHE_R2_BUCKET",
-      "bucket_name": "neubond-reset-password-cache"
+      "binding": "IFU_BUCKET",
+      "bucket_name": "neubond-ifu-documents"
     }
   ]
 }
