@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -102,6 +102,41 @@ const variantClass: Record<FeedbackVariant, string> = {
 };
 
 // ---------------------------------------------------------------------------
+// Breached-password check — mirrors Supabase's leaked-password protection,
+// which uses the HaveIBeenPwned Pwned Passwords range API. k-anonymity: only
+// the first 5 chars of the SHA-1 hash ever leave the browser, never the
+// password. Doing it here lets us warn in realtime instead of failing
+// server-side after the recovery token has already been spent.
+// ---------------------------------------------------------------------------
+
+type PwnedStatus = "idle" | "checking" | "safe" | "pwned" | "error";
+
+async function countPwnedOccurrences(password: string): Promise<number> {
+  const digest = await crypto.subtle.digest(
+    "SHA-1",
+    new TextEncoder().encode(password),
+  );
+  const hashHex = Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase();
+  const prefix = hashHex.slice(0, 5);
+  const suffix = hashHex.slice(5);
+
+  const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
+  if (!res.ok) throw new Error(`HIBP request failed: ${res.status}`);
+  const body = await res.text();
+
+  for (const line of body.split("\n")) {
+    const [lineSuffix, count] = line.split(":");
+    if (lineSuffix.trim() === suffix) {
+      return parseInt(count, 10) || 0;
+    }
+  }
+  return 0;
+}
+
+// ---------------------------------------------------------------------------
 // Form
 // ---------------------------------------------------------------------------
 
@@ -109,12 +144,22 @@ export function UpdatePasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
-  const supabase = createClient();
+  // Memoized so the effects below don't re-run on every render.
+  const supabase = useMemo(() => createClient(), []);
 
   // Recovery token forwarded (unconsumed) from /auth/confirm. We verify it only
   // when the user saves, so merely opening this page never burns the token.
   const searchParams = useSearchParams();
   const tokenHash = searchParams.get("token_hash");
+
+  // Once the token has been exchanged for a session it must never be verified
+  // again (it is single-use). A failed updateUser keeps the session alive, so
+  // the user can fix the password and retry via the live session — no re-verify
+  // of a now-spent token. Mount check below also flips this true if a session
+  // already exists (e.g. after a page reload or a re-click of the email link).
+  const sessionEstablishedRef = useRef(false);
+
+  const [pwnedStatus, setPwnedStatus] = useState<PwnedStatus>("idle");
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
@@ -145,6 +190,42 @@ export function UpdatePasswordForm({
     if (confirmPassword.length > 0) setConfirmTouched(true);
   }, [confirmPassword]);
 
+  // If a session already exists when the page loads (the token was exchanged on
+  // a prior attempt, or a reload), skip re-verifying — we'll update via that
+  // live session instead of a spent token.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) sessionEstablishedRef.current = true;
+    });
+  }, [supabase]);
+
+  // Realtime breach check, debounced ~500ms. Only runs once the password meets
+  // the basic requirements — a short/invalid one is already flagged elsewhere.
+  useEffect(() => {
+    if (!isValidPassword(password)) {
+      setPwnedStatus("idle");
+      return;
+    }
+
+    let cancelled = false;
+    setPwnedStatus("checking");
+    const handle = setTimeout(async () => {
+      try {
+        const count = await countPwnedOccurrences(password);
+        if (!cancelled) setPwnedStatus(count > 0 ? "pwned" : "safe");
+      } catch {
+        // HIBP unreachable: don't block the user — Supabase still enforces its
+        // own leaked-password check on save as a backstop.
+        if (!cancelled) setPwnedStatus("error");
+      }
+    }, 500);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(handle);
+    };
+  }, [password]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitAttempted(true);
@@ -160,32 +241,68 @@ export function UpdatePasswordForm({
       return;
     }
 
+    // Catch the "easy to guess" case before spending the token — mirrors
+    // Supabase's leaked-password protection, so this never fails server-side
+    // after the link has already been consumed.
+    if (pwnedStatus === "pwned") {
+      setError(
+        "This password has appeared in known data breaches. Please choose a different one.",
+      );
+      return;
+    }
+    if (pwnedStatus === "checking") {
+      setError("Still checking this password — one moment, then try again.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // Consume the recovery token now (at save time), then set the password.
-      // This is what actually expires the email link — not just opening it.
-      if (tokenHash) {
+      // Exchange the recovery token for a session exactly once. If a later step
+      // fails (e.g. the server rejects the password because it matches the old
+      // one), the session stays valid, so a retry skips this block and updates
+      // via the live session — the spent, single-use token is never re-verified.
+      if (tokenHash && !sessionEstablishedRef.current) {
         const { error: otpError } = await supabase.auth.verifyOtp({
           type: "recovery",
           token_hash: tokenHash,
         });
         if (otpError) throw otpError;
+        sessionEstablishedRef.current = true;
       }
 
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
 
+      // Only after a genuine success do we finalise and drop the session.
       setSuccess(true);
       await supabase.auth.signOut();
-    } catch (err) {
+    } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
   }
 
-  const passwordFeedback = passwordFeedbackFor(password, passwordTouched);
+  // Base requirement feedback, then overlay the realtime breach status once the
+  // password already satisfies the requirements.
+  const requirementFeedback = passwordFeedbackFor(password, passwordTouched);
+  const passwordFeedback: Feedback =
+    passwordTouched && isValidPassword(password)
+      ? pwnedStatus === "checking"
+        ? { lines: ["Checking if this password is safe…"], variant: "neutral" }
+        : pwnedStatus === "pwned"
+          ? {
+              lines: [
+                "This password has appeared in data breaches. Please choose another.",
+              ],
+              variant: "invalid",
+            }
+          : pwnedStatus === "safe"
+            ? { lines: ["Password strength looks good."], variant: "valid" }
+            : requirementFeedback // "idle"/"error" → keep requirement feedback
+      : requirementFeedback;
+
   const confirmFeedback = confirmFeedbackFor(
     password,
     confirmPassword,
@@ -233,9 +350,15 @@ export function UpdatePasswordForm({
               placeholder="Create a strong password"
               className={cn(
                 "pr-10 transition-colors",
-                passwordTouched && passwordValid && "border-green-600",
-                // Red border only after submit attempt, mirrors Flutter _showPasswordFieldValidation
-                submitAttempted && !passwordValid && "border-red-500",
+                passwordTouched &&
+                  passwordValid &&
+                  pwnedStatus === "safe" &&
+                  "border-green-600",
+                // Red border after a submit attempt on an invalid password, or
+                // anytime the realtime breach check flags it.
+                ((submitAttempted && !passwordValid) ||
+                  pwnedStatus === "pwned") &&
+                  "border-red-500",
               )}
               required
               value={password}
@@ -316,7 +439,13 @@ export function UpdatePasswordForm({
           <Button
             type="submit"
             className="w-full"
-            disabled={isLoading || !password || !confirmPassword}
+            disabled={
+              isLoading ||
+              !password ||
+              !confirmPassword ||
+              pwnedStatus === "checking" ||
+              pwnedStatus === "pwned"
+            }
           >
             {isLoading ? "Saving..." : "Save new password"}
           </Button>
