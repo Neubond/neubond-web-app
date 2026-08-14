@@ -1,0 +1,21 @@
+---
+description: Regenerate the web app CycloneDX SBOM when the user says "generate sbom"
+alwaysApply: false
+---
+
+# Generate SBOM (Neubond web app)
+
+When the user asks to **generate sbom**, **regenerate sbom**, or **update the SBOM**:
+
+Follow `.cursor/commands/generate-sbom.md` in full.
+
+Key points:
+
+- Generator is `@cyclonedx/cyclonedx-npm`, already a devDependency on `main`. There is **no** IPA and no Python SBOM script in this repo
+- Command: `npx @cyclonedx/cyclonedx-npm --output-file sbom.json --output-format json --spec-version 1.6`
+- Run against a clean `npm ci` tree so the SBOM matches the committed lockfile
+- Requires Node 20.9+ (see `.nvmrc`)
+- `sbom.json` is committed on `main` only. The two branches resolve different trees, so always say which branch it came from
+- Report component count, timestamp, and a diff summary against the previous `sbom.json`
+- Do **not** commit the regenerated file unless explicitly asked
+- `npm audit --json` gives the vulnerability view and does not need the SBOM regenerated first

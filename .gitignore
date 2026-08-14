@@ -50,3 +50,6 @@ cloudflare-env.d.ts
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local admin scripts (invoked with service-role credentials)
+scripts/admin-reset-password.mjs

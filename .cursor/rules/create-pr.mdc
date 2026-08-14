@@ -1,0 +1,22 @@
+---
+description: Open a Neubond web app GitHub PR when the user says "create pr", "open pr", or similar
+alwaysApply: true
+---
+
+# Create PR (Neubond web app)
+
+When the user asks to **create pr**, **open pr**, **make a pr**, or similar:
+
+Follow `.cursor/commands/create-pr.md` in full.
+
+Key points:
+
+- Canonical PR template: `.github/PULL_REQUEST_TEMPLATE.md`
+- Cursor command: `.cursor/commands/create-pr.md`
+- **Two long-lived deployment branches** — `main` (Cloudflare) and `vercel-deploy` (Vercel). Base each PR on its own lineage and never open one across them
+- A change affecting both targets needs **two PRs**, cross-referenced in the Deployment target section
+- Check whether the base branch has unpushed local commits, and branch from `origin/<base>` when it does
+- State real verification only (`npm run build`, `npm run lint`, `npm audit`)
+- Search GitHub issues before finalizing `### Fixes`. Use `Refs #n` for partial progress
+- Respect overrides like **draft only** and **against `<branch>`**
+- Do not merge unless explicitly asked

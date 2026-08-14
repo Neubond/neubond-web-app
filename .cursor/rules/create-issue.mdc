@@ -1,0 +1,23 @@
+---
+description: Draft or open a Neubond web app GitHub issue when the user says "create issue", "file issue", or runs /create-issue
+alwaysApply: false
+---
+
+# Create issue (Neubond web app)
+
+When the user asks to **create issue**, **file issue**, **draft issue**, or runs **`/create-issue`**:
+
+Follow `.cursor/commands/create-issue.md` in full.
+
+Key points:
+
+- **Issue type is required** (bug, feature, improvement, tech-debt, design, documentation) — ask once if missing
+- Canonical instructions: `.github/issue_instructions/` + matching `.github/ISSUE_TEMPLATE/*.yml`
+- **App version** comes from `package.json` `version`, not `pubspec.yaml`
+- **Deployment target** is always set: `target-cloudflare` (`main`) or `target-vercel` (`vercel-deploy`), usually both
+- Browser and device dropdowns only appear on the templates where they matter — do not invent them elsewhere
+- Draft like **feedback**: current vs desired. Do not invent the implementation solution
+- Primary description field: **one paragraph only** (no bullets in that field)
+- Acceptance criteria: **absolute requirements only** (browser, platform, external service gates)
+- ADHD-shaped: short, third person, no semicolons, ≤5 bullets in other fields, one copyable code block
+- Default **draft only**. Open with `gh issue create` only when the user asks to file/open
