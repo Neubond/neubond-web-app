@@ -34,10 +34,19 @@ concurrency:
 
 jobs:
   sbom:
-    name: Generate SBOM and scan
+    name: Generate SBOM and scan${{ matrix.ref != '' && format(' ({0})', matrix.ref) || '' }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # GitHub only fires scheduled workflows on the default branch, so surveillance
+        # has to name both deployment branches explicitly. Every other event scans
+        # whichever ref triggered it.
+        ref: ${{ github.event_name == 'schedule' && fromJSON('["main","vercel-deploy"]') || fromJSON('[""]') }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.ref != '' && matrix.ref || github.ref }}
 
       - uses: actions/setup-node@v4
         with:
@@ -62,7 +71,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sbom-${{ github.ref_name }}-${{ github.sha }}
+          name: sbom-${{ matrix.ref != '' && matrix.ref || github.ref_name }}-${{ github.sha }}
           path: sbom/
           retention-days: 90
 
@@ -91,7 +100,7 @@ jobs:
           BODY=$(cat <<EOF
           ### Technical Debt Description
 
-          The scheduled vulnerability scan failed against dependencies that have not changed, which means one or more advisories were published against the existing dependency tree since the last run. The run log lists the affected packages and severities, and the uploaded artifact carries the full SBOM and vulnerability report for the scanned commit.
+          The scheduled vulnerability scan failed against dependencies that have not changed, which means one or more advisories were published against the existing dependency tree since the last run. Both deployment branches are scanned, so check the run log to see which leg failed. The log lists the affected packages and severities, and the uploaded artifact carries the full SBOM and vulnerability report for each scanned commit.
 
           ### Impact
 
