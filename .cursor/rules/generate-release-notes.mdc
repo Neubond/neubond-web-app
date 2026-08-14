@@ -1,0 +1,23 @@
+---
+description: Generate GitHub release notes and CHANGELOG when the user says "generate release notes" or similar
+alwaysApply: false
+---
+
+# Generate release notes (Neubond web app)
+
+When the user asks to **generate release notes**, **create release notes**, **update changelog** for a release, or similar:
+
+Follow `.cursor/commands/generate-release-notes.md` in full.
+
+Key points:
+
+- There is **no** `scripts/release_notes/` generator in this repo. Collect changes directly with `git log <prev>..<current>` and `gh pr list`
+- Two change sources: **PR-backed issues** (`#n` / `PR #n`) and **direct commits** (`` `hash` ``)
+- Categorise from the commit type prefix (`feat`, `fix`, `improv`, `refactor`, `chore`, `techDebt`, `documentation`)
+- **Documentation scoping:** `README.md`, `.github/`, or `docs/` changes without app code (`app/`, `components/`, `lib/`, `emails/`) → **Documentation**
+- **Deployment scoping:** say which target the release covers. Do not silently mix Cloudflare-only and Vercel-only changes
+- Release header format: `Tag · Commit · Version · Target · Date` on a single metadata line, version from `package.json`
+- `CHANGELOG.md`: user-facing only — exclude documentation, tech debt, internal/chore/ci
+- Changelog style: `You can now…`, `X is now…`, `X no longer…` — never issue titles, label tags, or `The app now…` phrasing
+- Human review gate before writing files or publishing
+- Do not commit or push unless explicitly asked

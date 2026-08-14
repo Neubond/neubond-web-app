@@ -1,0 +1,99 @@
+name: ✨ Feature
+description: Request a new capability in the web app
+title: "[FEATURE] "
+labels: ["feature", "todo"]
+assignees: []
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: Describe the feature in detail
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefit
+    attributes:
+      label: Expected Benefit
+      description: Who benefits and how
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements / Acceptance Criteria
+      description: Absolute external gates only, such as browser, platform, or service availability
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Remarks
+      description: Any additional information
+    validations:
+      required: false
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Source of Feedback
+      description: Where was the feedback sourced from and when?
+    validations:
+      required: true
+
+  - type: textarea
+    id: version
+    attributes:
+      label: App version
+      description: The `version` field in `package.json` at time of feedback
+    validations:
+      required: true
+
+  - type: dropdown
+    id: target
+    attributes:
+      label: Deployment target(s)
+      description: Which deployment does this apply to?
+      multiple: true
+      options:
+        - target-cloudflare
+        - target-vercel
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How critical is this?
+      multiple: false
+      options:
+        - priority-low
+        - priority-medium
+        - priority-high
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area(s)
+      description: Select one or more affected areas
+      multiple: true
+      options:
+        - auth
+        - ifu
+        - emails
+        - supabase
+        - ui
+        - routing
+        - storage
+        - deployment
+        - seo
+        - app-wide
+    validations:
+      required: true

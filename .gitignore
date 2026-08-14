@@ -37,9 +37,19 @@ yarn-error.log*
 # vercel
 .vercel
 
+# cloudflare / opennext
+.open-next
+.wrangler
+.dev.vars
+.dev.vars.local
+cloudflare-env.d.ts
+
 # supabase
 /supabase
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local admin scripts (invoked with service-role credentials)
+scripts/admin-reset-password.mjs

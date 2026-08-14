@@ -1,0 +1,118 @@
+---
+description: Draft Neubond IEC 62304 Class B QMS software docs by phase (SDP, SRS, HZC, SAD, SDD, SOUP, SBOM, CMP, CVR, SRR, test protocols) when the user asks to create or update regulated documentation
+alwaysApply: false
+---
+
+# QMS software documentation (Neubond)
+
+> **Scope note:** This rule is inherited from `Neubond-App-v2` and describes the Loop I device,
+> firmware, and Flutter app QMS. Its paths (`docs/qms/`, `lib/`, `ios/`, `west.yml`) refer to those
+> repositories, not this web app. Kept here for when the web app enters IEC 62304 scope.
+
+When the user asks to **create**, **draft**, **write**, or **update** QMS / regulatory / DHF software documentation, follow this workflow.
+
+**Product context:** **Neubond Loop I** — **Class I** medical device, **Class B** software (IEC 62304). Use *Neubond Loop I* / *Loop I* in regulated prose. Do **not** use internal codenames (gamma, gammaV1, ArmIO, nubizBoard, board targets) in QMS text.
+
+## 1. Read instructions and template
+
+Read `docs/qms/instructions_for_qms_docs.md` in full — especially **Documentation scope**, **Document set and phases**, **How documents relate (traceability)**, **Writing rules**, and **Authoring workflow**.
+
+Read the matching official template in **`docs/qms/Templates/`** when one exists (naming: `<DocCode>_template.md`, e.g. `SOUP_template.md`, `SRR_template.md`). Draft to the **controlled record** path under the phase folder, not the template file.
+
+| Templates (structure only) | Controlled record |
+| -------------------------- | ----------------- |
+| `docs/qms/Templates/SOUP_template.md` | `docs/qms/Phase III/SOUP.md` (**NBD-LP1-SOUP-001**) |
+| `docs/qms/Templates/SRR_template.md` | `docs/qms/Phase IV/SRR.md` (**NBD-LP1-SRR-001**) |
+| `docs/qms/Templates/work_instruction_template.md` | eQMS / DHF (engineering drafts: `docs/qms/work_instructions/`) |
+
+Do **not** treat `docs/qms/Templates/` files as approved controlled records.
+
+## 2. Documentation scope (mandatory)
+
+QMS artifacts describe the **entire Neubond Loop I software architecture**:
+
+| Layer | In scope |
+| ----- | -------- |
+| **Wearable firmware** | Loop I wearable on nRF52840; Zephyr OS + nRF Connect SDK (NCS); BLE GATT; EMG, haptics, storage; OTA via MCUboot + MCUmgr/SMP |
+| **Mobile app** | Production **iOS on iPad** — BLE, therapy/calibration/monitoring, OTA UI |
+| **Backend** | Supabase, Next.js auth web, Vercel hosting, Resend email (see **NBD-LP1-SOUP-001** for top-level SOUP rows) |
+| **Monitoring** | Sentry crash reporting on the production iOS app (**SOUP-04**) |
+
+**Mobile app filter:** production **iOS only**. Exclude Android, USB serial, debug tools, internal test/research-only features, and non-production app variants.
+
+**Firmware baseline:** **`neubond-firmware/`** — not `Neubond-App-v2/firmware/` (legacy DHF). Prefer `west.yml`, production source, and interface docs over stale `neubond-firmware/docs/sop/` prose.
+
+**Production firmware filter:** document **production** overlay behavior. Exclude bench/HIL overlays (`no_sleep_dev`, `hil_orchestrator`) and USB CDC from production system narratives unless the user expands scope.
+
+Cross-item interfaces: **BLE** (firmware and app), **HTTPS** (app and backend).
+
+## 2b. Out of scope — `docs/sbom/` (mandatory)
+
+`docs/sbom/` is **engineering workspace only** — outside the QMS boundary.
+
+When executing any **create qms …** workflow:
+
+- Do **not** read, write, edit, create, or delete anything under `docs/sbom/`.
+- Do **not** run engineering SBOM generator scripts (`sbom_generate*.py`) as part of QMS work.
+- Do **not** reference paths under `docs/sbom/` in QMS artifacts or in chat outputs for QMS tasks.
+- Controlled SBOM records are **only** under `docs/qms/Phase III/`: **NBD-LP1-SBOM-001** (`SBOM.md`), `sbom_*.json`, `vulnerability_report_*.json`.
+- If machine-readable SBOM files need regeneration, tell the user to run **generate sbom** / **generate sbom ios** separately. Update Phase III JSON only when the user supplies promoted artifacts or explicitly asks.
+
+## 3. Identify phase and document type
+
+| Phase | Documents | Controlled record paths (see instructions for full table) |
+| ----- | --------- | --------------------------------------------------------- |
+| I — Planning | SDP; URS/IPS (**read-only**) | `docs/qms/Phase I/` |
+| II — Inputs | SRS, HZC, SAD | `docs/qms/phase-ii-inputs/` |
+| III — Outputs | SDD, SOUP, SBOM, CMP | `docs/qms/Phase III/`, `docs/qms/phase-iii-outputs/` |
+| IV — Verification & release | CVR, test protocols, SRR | `docs/qms/phase-iv-verification/`, `docs/qms/Phase IV/SRR.md` |
+| V — Validation | TBD | `docs/qms/phase-v-validation/` |
+
+## 4. Read upstream docs first
+
+Read `docs/qms/Phase I/IPS.md` and `docs/qms/Phase I/URS.md` before drafting Phase II+ artifacts. **Never edit IPS or URS** — immutable approved references.
+
+Read upstream controlled records in the same or earlier phase. Align the document under edit. Do not contradict IPS or URS.
+
+**Cross-document issues — report only.** Do not edit other QMS files unless the user explicitly requests it. End with **Cross-document impact** when other docs need changes.
+
+## 5. Gather evidence (in-scope only)
+
+| Layer | Sources |
+| ----- | ------- |
+| **App (iOS)** | `lib/` (exclude Android/USB/debug-only), `docs/app_guide/ble_communication.md`, `docs/app_guide/ota.md`, `docs/app_guide/sentry.md`, `docs/app_guide/ios_commands.md`, `pubspec.yaml`, `ios/Podfile.lock` |
+| **Firmware** | **`neubond-firmware/`**: `west.yml`, `prj.conf`, `src/`, `overlays/production.conf`; `docs/ARCHITECTURE.md`, `docs/COMMUNICATION_DESIGN.md`, `docs/ios_ota_integration.md`, `docs/learn/51_gatt_design.md` |
+| **Backend** | Supabase and backend auth usage in app and backend code, deployment/ops guides |
+
+Do not use `usb_communication.md`, Android guides, or legacy `Neubond-App-v2/firmware/` as production QMS evidence.
+
+## 6. Draft using Neubond conventions
+
+Follow **Writing rules** in `instructions_for_qms_docs.md`. Key agent checks:
+
+- **American English**; preserve IPS/URS wording when quoting.
+- **Full, complete sentences** in body text and SOUP narratives.
+- **Avoid semicolons** where separate sentences read clearer.
+- Write **Section** (not the section symbol).
+- **No arrows** in official QMS prose. Use *traces to*, *feeds*, *aligns with*, *implements*.
+- **Controlled document IDs:** **`NBD-LP1-<DocCode>-001`** when citing QMS records (not `NBM-LP1-…`).
+- Engineering guides (`docs/app_guide/`, `docs/ops_guide/`) are inputs — **not** controlled QMS records.
+
+**Regulatory concepts (do not conflate):** SOUP risk register (**NBD-LP1-SOUP-001**), SBOM inventory (**NBD-LP1-SBOM-001**), supplier approval (separate procedure), CSV (not applicable to app development). Top-level System SOUP list and evaluation details live in **NBD-LP1-SOUP-001** and `docs/qms/Templates/SOUP_template.md` — do not invent or shorten the list in the rule file.
+
+**Verification (Phase IV):**
+- **Unit** = feature-level (aligns with SAD). Export/reformat automated tests where possible.
+- **Integration** = component-to-component.
+- **System** = end-to-end (BLE, therapy flows, cloud, auth).
+- Not all tests need 1:1 SRS links. Backend/SOUP-dependent behavior may trace via SOUP management plus integration/system tests.
+- Cybersecurity controls verified in **NBD-LP1-CVR-001** per **NBD-LP1-CMP-001**.
+
+## 7. Write output
+
+Draft to the **controlled record** path in `instructions_for_qms_docs.md`. Follow the matching **`docs/qms/Templates/`** template for section structure. Remove template *Guidance* blocks and `«placeholders»` before approval.
+
+Use `[TBD]` for missing controlled content. Do not invent user needs or hazards.
+
+End with **Cross-document impact** if other docs need changes.
+
+**draft only**: chat only. Do not commit unless asked.

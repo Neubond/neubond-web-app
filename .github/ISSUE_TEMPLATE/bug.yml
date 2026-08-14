@@ -1,0 +1,134 @@
+name: 🐛 Bug
+description: Report a bug in the web app
+title: "[BUG] "
+labels: ["bug", "todo"]
+assignees: []
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Describe the bug in detail
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: List the steps to reproduce the bug
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behaviour
+      description: Describe what should happen
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behaviour
+      description: Describe what actually happens
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Remarks
+      description: Any additional information
+    validations:
+      required: false
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Source of Feedback
+      description: Where was the feedback sourced from and when?
+    validations:
+      required: true
+
+  - type: textarea
+    id: version
+    attributes:
+      label: App version
+      description: The `version` field in `package.json` at time of feedback
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser(s)
+      description: Which browsers show this?
+      multiple: true
+      options:
+        - browser-chrome
+        - browser-safari
+        - browser-firefox
+        - browser-edge
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device type(s)
+      description: Which viewport sizes are affected?
+      multiple: true
+      options:
+        - device-desktop
+        - device-mobile
+        - device-tablet
+    validations:
+      required: true
+
+  - type: dropdown
+    id: target
+    attributes:
+      label: Deployment target(s)
+      description: Which deployment does this apply to?
+      multiple: true
+      options:
+        - target-cloudflare
+        - target-vercel
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How critical is this?
+      multiple: false
+      options:
+        - priority-low
+        - priority-medium
+        - priority-high
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area(s)
+      description: Select one or more affected areas
+      multiple: true
+      options:
+        - auth
+        - ifu
+        - emails
+        - supabase
+        - ui
+        - routing
+        - storage
+        - deployment
+        - seo
+        - app-wide
+    validations:
+      required: true
