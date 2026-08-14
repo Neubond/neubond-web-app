@@ -84,6 +84,67 @@ jobs:
           path: sbom/
           retention-days: 90
 
+  # Committed evidence must name the deployment branch, not whichever feature branch
+  # it happened to be generated on. Regenerating here is the only point where the merge
+  # commit exists, so this is where the baseline becomes truthful.
+  baseline:
+    name: Refresh committed baseline
+    needs: sbom
+    if: >-
+      github.event_name == 'push' &&
+      (github.ref_name == 'main' || github.ref_name == 'vercel-deploy')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install from lockfile
+        run: npm ci
+
+      - name: Regenerate baseline
+        run: |
+          node scripts/sbom/generate.mjs --update-baseline --out sbom/current
+          node scripts/sbom/generate.mjs --omit-dev --out sbom/current-prod
+
+      - name: Commit only when the dependency set or findings changed
+        env:
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          digest_of() { node -e '
+            const fs=require("fs");
+            try { process.stdout.write(JSON.parse(fs.readFileSync(process.argv[1],"utf8")).contentDigest ?? ""); }
+            catch { process.stdout.write(""); }
+          ' "$1"; }
+
+          NEW="$(digest_of sbom/current/vulnerability-report.json)"
+          git show "HEAD:sbom/current/vulnerability-report.json" > /tmp/old.json 2>/dev/null || echo '{}' > /tmp/old.json
+          OLD="$(digest_of /tmp/old.json)"
+
+          # generatedAt and serialNumber differ every run, so only a digest change matters
+          if [ -n "$OLD" ] && [ "$NEW" = "$OLD" ]; then
+            echo "Baseline unchanged (digest ${NEW:0:12}). Nothing to commit."
+            git checkout -- sbom.json sbom/ 2>/dev/null || true
+            exit 0
+          fi
+
+          echo "Baseline changed: ${OLD:0:12} -> ${NEW:0:12}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sbom.json sbom/
+          # GITHUB_TOKEN pushes do not retrigger workflows, and [skip ci] is belt and braces
+          git commit -m "chore: refresh SBOM baseline on ${BRANCH} [skip ci]"
+          git push
+
   # A scheduled failure means a new advisory landed against unchanged code.
   # That needs a tracked record, not just a red run in the Actions tab.
   raise-issue:
