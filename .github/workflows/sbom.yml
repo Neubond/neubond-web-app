@@ -1,0 +1,123 @@
+name: SBOM and vulnerability monitoring
+
+# Supports the post-market surveillance duty in IEC 62304 Clause 6.1 and the
+# continuous third-party vulnerability monitoring expected by IEC 81001-5-1.
+# A point-in-time SBOM is not enough: newly disclosed advisories must be found
+# against dependencies that have not themselves changed.
+#
+# See docs/ops_guide/sbom_and_vulnerability_management.md
+
+on:
+  pull_request:
+    branches: [main, vercel-deploy]
+  push:
+    branches: [main, vercel-deploy]
+    tags: ["v*"]
+  schedule:
+    # 07:00 UTC every Monday — scheduled surveillance against a static tree
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+    inputs:
+      fail_on:
+        description: Minimum severity that fails the run
+        required: false
+        default: high
+        type: choice
+        options: [low, moderate, high, critical]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sbom-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sbom:
+    name: Generate SBOM and scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      # npm ci so the SBOM describes exactly what the committed lockfile resolves to
+      - name: Install from lockfile
+        run: npm ci
+
+      - name: Generate SBOM and vulnerability report
+        id: generate
+        run: |
+          node scripts/sbom/generate.mjs \
+            --fail-on "${{ inputs.fail_on || 'high' }}"
+
+      - name: Generate production-scope SBOM
+        if: always()
+        run: node scripts/sbom/generate.mjs --omit-dev --fail-on critical
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ github.ref_name }}-${{ github.sha }}
+          path: docs/sbom/
+          retention-days: 90
+
+  # A scheduled failure means a new advisory landed against unchanged code.
+  # That needs a tracked record, not just a red run in the Actions tab.
+  raise-issue:
+    name: Raise surveillance issue
+    needs: sbom
+    if: failure() && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Open or update the surveillance issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          TITLE="[TECH-DEBT] Scheduled vulnerability surveillance found new advisories"
+          EXISTING=$(gh issue list --state open --search "$TITLE in:title" --json number --jq '.[0].number // empty')
+
+          BODY=$(cat <<EOF
+          ### Technical Debt Description
+
+          The scheduled vulnerability scan failed against dependencies that have not changed, which means one or more advisories were published against the existing dependency tree since the last run. The run log lists the affected packages and severities, and the uploaded artifact carries the full SBOM and vulnerability report for the scanned commit.
+
+          ### Impact
+
+          - **Security** — known advisories now affect the shipped dependency tree
+          - **Reliability** — the severity gate is failing, so release builds are blocked until triaged
+
+          ### Proposed Solution
+
+          Triage against \`docs/ops_guide/sbom_and_vulnerability_management.md\`, then either upgrade the affected packages or record an assessed exception.
+
+          ### Source of Feedback
+
+          Automated scheduled scan on \`$(date -u +%Y-%m-%d)\`.
+
+          ### App version
+
+          \`$(node -p "require('./package.json').version")\`
+
+          ### Run
+
+          $RUN_URL
+          EOF
+          )
+
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "Scan failed again on $(date -u +%Y-%m-%d). See $RUN_URL"
+          else
+            gh issue create --title "$TITLE" --body "$BODY" --label "tech-debt,todo"
+          fi
