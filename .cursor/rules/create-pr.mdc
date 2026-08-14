@@ -17,6 +17,7 @@ Key points:
 - A change affecting both targets needs **two PRs**, cross-referenced in the Deployment target section
 - Check whether the base branch has unpushed local commits, and branch from `origin/<base>` when it does
 - State real verification only (`npm run build`, `npm run lint`, `npm audit`)
-- Search GitHub issues before finalizing `### Fixes`. Use `Refs #n` for partial progress
+- Search GitHub issues before finalizing `### Fixes`. Default to `Fixes #n` so the issue closes on merge. Use `Refs #n` only for partial progress, and switch the last PR of a pair to `Fixes`
+- Closing works on both branches: GitHub handles `main`, and `.github/workflows/close-issues.yml` handles `vercel-deploy`
 - Respect overrides like **draft only** and **against `<branch>`**
 - Do not merge unless explicitly asked

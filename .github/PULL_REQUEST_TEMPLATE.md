@@ -80,8 +80,17 @@ Suggested workflow:
 4. Use:
    Fixes #123
 
-If a PR only partially advances an issue, use `Refs #123` so the issue stays open.
+Use `Fixes #123` when this PR completes the issue. It is the default, and it closes
+the issue automatically on merge.
+
+Use `Refs #123` only when the PR partially advances an issue that stays open, which
+usually means the paired PR on the other deployment branch has not merged yet. Swap it
+to `Fixes` on whichever PR lands last.
+
 If no issue matches, leave Fixes empty or write None.
+
+Closing works on both branches: GitHub handles merges into `main`, and the
+close-issues workflow handles merges into `vercel-deploy`.
 -->
 
 Fixes #
