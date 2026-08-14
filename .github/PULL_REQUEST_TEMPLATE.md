@@ -91,6 +91,11 @@ If no issue matches, leave Fixes empty or write None.
 
 Closing works on both branches: GitHub handles merges into `main`, and the
 close-issues workflow handles merges into `vercel-deploy`.
+
+CAUTION: closing keywords fire from ANYWHERE in the body, not just this section.
+That is GitHub's own behaviour and the workflow matches it. A keyword written inside
+prose or an example will close that issue for real. Write placeholders such as
+"Fixes #<n>" when illustrating the syntax, never a live issue number.
 -->
 
 Fixes #
