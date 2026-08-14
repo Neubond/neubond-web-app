@@ -42,7 +42,7 @@ Use the full branch history, not just the latest commit. Check whether the base 
 - **Title:** `<Type>: <one line>`
 - **Body sections:** `### Summary`, `### More details`, `### Deployment target`, `### Verification`, `### Fixes`
 - **Verification:** state what was actually run (`npm run build`, `npm run lint`, `npm audit`). Do not claim checks that were not run
-- **Fixes:** search GitHub issues with `gh issue list` / `gh issue view`; only link issues clearly addressed by the branch. Use `Refs #n` when the PR only partially advances an issue
+- **Fixes:** search GitHub issues with `gh issue list` / `gh issue view`; only link issues clearly addressed by the branch. Default to `Fixes #n`, which closes the issue on merge. Use `Refs #n` only when the issue must stay open, typically because the paired PR on the other deployment branch has not merged yet, and switch the last one to `Fixes`
 
 ## 5. Draft-only override
 
