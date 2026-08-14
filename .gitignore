@@ -53,3 +53,4 @@ next-env.d.ts
 
 # local admin scripts (invoked with service-role credentials)
 scripts/admin-reset-password.mjs
+
