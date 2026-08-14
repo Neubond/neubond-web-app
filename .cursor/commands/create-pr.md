@@ -42,6 +42,7 @@ Use the full branch history, not just the latest commit. Check whether the base 
 - **Title:** `<Type>: <one line>`
 - **Body sections:** `### Summary`, `### More details`, `### Deployment target`, `### Verification`, `### Fixes`
 - **Verification:** state what was actually run (`npm run build`, `npm run lint`, `npm audit`). Do not claim checks that were not run
+- **Closing keywords fire from anywhere in the body**, not only the `### Fixes` section. Never write a live issue number after a closing keyword in prose or an example. Use `Fixes #<n>` as a placeholder when illustrating syntax
 - **Fixes:** search GitHub issues with `gh issue list` / `gh issue view`; only link issues clearly addressed by the branch. Default to `Fixes #n`, which closes the issue on merge. Use `Refs #n` only when the issue must stay open, typically because the paired PR on the other deployment branch has not merged yet, and switch the last one to `Fixes`
 
 ## 5. Draft-only override
