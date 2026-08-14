@@ -3,15 +3,15 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "version": 1,
-  "serialNumber": "urn:uuid:f2fed485-c719-4977-873b-eafed3cf76a3",
+  "serialNumber": "urn:uuid:c736c053-69f2-421c-8b72-670a0900e5d4",
   "metadata": {
-    "timestamp": "2026-08-14T10:48:56.581Z",
+    "timestamp": "2026-08-14T10:53:25.411Z",
     "tools": {
       "components": [
         {
           "type": "application",
           "name": "npm",
-          "version": "11.15.0"
+          "version": "10.9.8"
         },
         {
           "type": "application",
@@ -107,7 +107,7 @@
       },
       {
         "name": "neubond:sbom:commit",
-        "value": "6d0680ce250d701b2ca95a2bb8c9ab93635a5925"
+        "value": "2a50005070d6ccb5fbab1a16a177fc8ed3323e16"
       },
       {
         "name": "neubond:sbom:branch",
@@ -119,11 +119,11 @@
       },
       {
         "name": "neubond:sbom:node",
-        "value": "v22.19.0"
+        "value": "v22.23.2"
       },
       {
         "name": "neubond:sbom:manufacturerCoverage",
-        "value": "790/825"
+        "value": "796/831"
       }
     ]
   },
@@ -187,6 +187,331 @@
       "authors": [
         {
           "name": "Jan Kowalleck"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "core",
+      "group": "@emnapi",
+      "version": "1.10.0",
+      "bom-ref": "neubond-web-portal@1.0.0|@emnapi/core@1.10.0",
+      "author": "toyobayashi",
+      "description": "emnapi core",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40emnapi/core@1.10.0",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/toyobayashi/emnapi.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/toyobayashi/emnapi#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/toyobayashi/emnapi/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        },
+        {
+          "url": "https://registry.npmjs.org/@emnapi/core/-/core-1.10.0.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "caae8e909e29f360807cf974bbd99079b40728f26463b5ab22e936d3971362761efa4d99f18061d7516b6d11bf1fa8a18aba9c69c3a09760483bca323102de5f"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:extraneous",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@emnapi/core"
+        }
+      ],
+      "publisher": "toyobayashi",
+      "authors": [
+        {
+          "name": "toyobayashi"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "runtime",
+      "group": "@emnapi",
+      "version": "1.11.3",
+      "bom-ref": "neubond-web-portal@1.0.0|@emnapi/runtime@1.11.3",
+      "author": "toyobayashi",
+      "description": "emnapi runtime",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40emnapi/runtime@1.11.3",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/toyobayashi/emnapi.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/toyobayashi/emnapi#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/toyobayashi/emnapi/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        },
+        {
+          "url": "https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.3.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "5f3e13a72922ed7caba5b50ad6347502174075a5f2861638959de778ba1d9a1a6e59fcb63c040de41e3ab00894e2588e5c62e41f2a67fea53e8ef7d64826182c"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:extraneous",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@emnapi/runtime"
+        }
+      ],
+      "publisher": "toyobayashi",
+      "authors": [
+        {
+          "name": "toyobayashi"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "wasi-threads",
+      "group": "@emnapi",
+      "version": "1.2.1",
+      "bom-ref": "neubond-web-portal@1.0.0|@emnapi/wasi-threads@1.2.1",
+      "author": "toyobayashi",
+      "description": "WASI threads proposal implementation in JavaScript",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40emnapi/wasi-threads@1.2.1",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/toyobayashi/emnapi.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/toyobayashi/emnapi#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/toyobayashi/emnapi/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        },
+        {
+          "url": "https://registry.npmjs.org/@emnapi/wasi-threads/-/wasi-threads-1.2.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "b93208ece605fbf31eb3f32b708398a79c8eb5230b056488a0b3e9720c22a6888a6e58ba937db6b5ca05b31a082313c3a96d35490180824a38133662d8136fdb"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:extraneous",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@emnapi/wasi-threads"
+        }
+      ],
+      "publisher": "toyobayashi",
+      "authors": [
+        {
+          "name": "toyobayashi"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "sharp-wasm32",
+      "group": "@img",
+      "version": "0.35.3",
+      "bom-ref": "neubond-web-portal@1.0.0|@img/sharp-wasm32@0.35.3",
+      "author": "Lovell Fuller",
+      "description": "Prebuilt sharp for use with WebAssembly",
+      "scope": "optional",
+      "licenses": [
+        {
+          "expression": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
+          "acknowledgement": "declared"
+        }
+      ],
+      "purl": "pkg:npm/%40img/sharp-wasm32@0.35.3",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/lovell/sharp.git#npm/wasm32",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+        },
+        {
+          "url": "https://sharp.pixelplumbing.com",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/lovell/sharp/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        },
+        {
+          "url": "https://registry.npmjs.org/@img/sharp-wasm32/-/sharp-wasm32-0.35.3.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "719d1791c606a47664a96ea20a4a93726502d020fd0e10f977fa9e6656647d1067e869c79e26572d4a39fbdc70f08bfbe9813a2d014df5834194a4447021bbeb"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:extraneous",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@img/sharp-wasm32"
+        }
+      ],
+      "publisher": "Lovell Fuller",
+      "authors": [
+        {
+          "name": "Lovell Fuller"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "wasm-runtime",
+      "group": "@napi-rs",
+      "version": "1.2.3",
+      "bom-ref": "neubond-web-portal@1.0.0|@napi-rs/wasm-runtime@1.2.3",
+      "author": "LongYinan",
+      "description": "Runtime and polyfill for wasm targets",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40napi-rs/wasm-runtime@1.2.3",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/napi-rs/napi-rs.git#wasm-runtime",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+        },
+        {
+          "url": "https://napi.rs/",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/napi-rs/napi-rs/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        },
+        {
+          "url": "https://registry.npmjs.org/@napi-rs/wasm-runtime/-/wasm-runtime-1.2.3.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "50c76e31ba8ee6ce7317636435a70c4ffc8ae58e5088abd6af6fb9d1bcc8231143c15276878f5bfa8ca368218f849c5ddbf802db1dfd107bff80756ebb7eb1d9"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:extraneous",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@napi-rs/wasm-runtime"
+        }
+      ],
+      "publisher": "LongYinan",
+      "authors": [
+        {
+          "name": "LongYinan"
         }
       ]
     },
@@ -645,6 +970,73 @@
       "authors": [
         {
           "name": "tailwindlabs"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "wasm-util",
+      "group": "@tybys",
+      "version": "0.10.3",
+      "bom-ref": "neubond-web-portal@1.0.0|@tybys/wasm-util@0.10.3",
+      "author": "toyobayashi",
+      "description": "WASI polyfill for browser and some wasm util",
+      "scope": "optional",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/%40tybys/wasm-util@0.10.3",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/toyobayashi/wasm-util.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://github.com/toyobayashi/wasm-util#readme",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/toyobayashi/wasm-util/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        },
+        {
+          "url": "https://registry.npmjs.org/@tybys/wasm-util/-/wasm-util-0.10.3.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "1777e8d4c62b44960bdf3111d0e50e9a4bad8ebd55a76de6eceb12829ee7ab848fe8ea97e82ff9e971483c09796eddf3681463996ed21b3deeffa2f016961c3a"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:development",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:extraneous",
+          "value": "true"
+        },
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/@tybys/wasm-util"
+        }
+      ],
+      "publisher": "toyobayashi",
+      "authors": [
+        {
+          "name": "toyobayashi"
         }
       ]
     },
@@ -3601,6 +3993,63 @@
       "authors": [
         {
           "name": "Ozgur Ozcitak"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "name": "tslib",
+      "version": "2.8.1",
+      "bom-ref": "neubond-web-portal@1.0.0|tslib@2.8.1",
+      "author": "Microsoft Corp.",
+      "description": "Runtime library for TypeScript helper functions",
+      "licenses": [
+        {
+          "license": {
+            "id": "0BSD",
+            "acknowledgement": "declared"
+          }
+        }
+      ],
+      "purl": "pkg:npm/tslib@2.8.1",
+      "externalReferences": [
+        {
+          "url": "git+https://github.com/Microsoft/tslib.git",
+          "type": "vcs",
+          "comment": "as detected from PackageJson property \"repository.url\""
+        },
+        {
+          "url": "https://www.typescriptlang.org/",
+          "type": "website",
+          "comment": "as detected from PackageJson property \"homepage\""
+        },
+        {
+          "url": "https://github.com/Microsoft/TypeScript/issues",
+          "type": "issue-tracker",
+          "comment": "as detected from PackageJson property \"bugs.url\""
+        },
+        {
+          "url": "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz",
+          "type": "distribution",
+          "hashes": [
+            {
+              "alg": "SHA-512",
+              "content": "a0916ef781d06fe29576e49440bef09e99aa9df98bb0e03f9c087a6fa107d30084a0ad3f98f79753a737c0a0d5f373243ae1cf447b525ca294f7d2016b34bfdb"
+            }
+          ],
+          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+        }
+      ],
+      "properties": [
+        {
+          "name": "cdx:npm:package:path",
+          "value": "node_modules/tslib"
+        }
+      ],
+      "publisher": "Microsoft Corp.",
+      "authors": [
+        {
+          "name": "Microsoft Corp."
         }
       ]
     },
@@ -13288,6 +13737,61 @@
       "components": [
         {
           "type": "library",
+          "name": "sharp-wasm32",
+          "group": "@img",
+          "version": "0.35.2",
+          "bom-ref": "neubond-web-portal@1.0.0|miniflare@5.20260811.1-alpha|@img/sharp-wasm32@0.35.2",
+          "author": "Lovell Fuller",
+          "description": "Prebuilt sharp for use with WebAssembly",
+          "scope": "optional",
+          "licenses": [
+            {
+              "expression": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
+              "acknowledgement": "declared"
+            }
+          ],
+          "purl": "pkg:npm/%40img/sharp-wasm32@0.35.2",
+          "externalReferences": [
+            {
+              "url": "git+https://github.com/lovell/sharp.git#npm/wasm32",
+              "type": "vcs",
+              "comment": "as detected from PackageJson property \"repository.url\" and \"repository.directory\""
+            },
+            {
+              "url": "https://sharp.pixelplumbing.com",
+              "type": "website",
+              "comment": "as detected from PackageJson property \"homepage\""
+            },
+            {
+              "url": "https://github.com/lovell/sharp/issues",
+              "type": "issue-tracker",
+              "comment": "as detected from PackageJson property \"bugs.url\""
+            },
+            {
+              "url": "https://registry.npmjs.org/@img/sharp-wasm32/-/sharp-wasm32-0.35.2.tgz",
+              "type": "distribution",
+              "hashes": [
+                {
+                  "alg": "SHA-512",
+                  "content": "32bbf8250358550f78c47fa3cd9f6bfa0a3095e37c9afd854e0293f8f23a6f1e42d06f1374d62776ed7ad698368bbba8070c72d8898f307ac938cd8b65e7fb07"
+                }
+              ],
+              "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
+            }
+          ],
+          "properties": [
+            {
+              "name": "cdx:npm:package:extraneous",
+              "value": "true"
+            },
+            {
+              "name": "cdx:npm:package:path",
+              "value": "node_modules/miniflare/node_modules/@img/sharp-wasm32"
+            }
+          ]
+        },
+        {
+          "type": "library",
           "name": "sharp",
           "version": "0.35.2",
           "bom-ref": "neubond-web-portal@1.0.0|miniflare@5.20260811.1-alpha|sharp@0.35.2",
@@ -18321,63 +18825,6 @@
       "authors": [
         {
           "name": "Anton Korzunov"
-        }
-      ]
-    },
-    {
-      "type": "library",
-      "name": "tslib",
-      "version": "2.8.1",
-      "bom-ref": "neubond-web-portal@1.0.0|tslib@2.8.1",
-      "author": "Microsoft Corp.",
-      "description": "Runtime library for TypeScript helper functions",
-      "licenses": [
-        {
-          "license": {
-            "id": "0BSD",
-            "acknowledgement": "declared"
-          }
-        }
-      ],
-      "purl": "pkg:npm/tslib@2.8.1",
-      "externalReferences": [
-        {
-          "url": "git+https://github.com/Microsoft/tslib.git",
-          "type": "vcs",
-          "comment": "as detected from PackageJson property \"repository.url\""
-        },
-        {
-          "url": "https://www.typescriptlang.org/",
-          "type": "website",
-          "comment": "as detected from PackageJson property \"homepage\""
-        },
-        {
-          "url": "https://github.com/Microsoft/TypeScript/issues",
-          "type": "issue-tracker",
-          "comment": "as detected from PackageJson property \"bugs.url\""
-        },
-        {
-          "url": "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz",
-          "type": "distribution",
-          "hashes": [
-            {
-              "alg": "SHA-512",
-              "content": "a0916ef781d06fe29576e49440bef09e99aa9df98bb0e03f9c087a6fa107d30084a0ad3f98f79753a737c0a0d5f373243ae1cf447b525ca294f7d2016b34bfdb"
-            }
-          ],
-          "comment": "as detected from npm-ls property \"resolved\" and property \"integrity\""
-        }
-      ],
-      "properties": [
-        {
-          "name": "cdx:npm:package:path",
-          "value": "node_modules/tslib"
-        }
-      ],
-      "publisher": "Microsoft Corp.",
-      "authors": [
-        {
-          "name": "Microsoft Corp."
         }
       ]
     },
@@ -55469,6 +55916,11 @@
       "ref": "neubond-web-portal@1.0.0",
       "dependsOn": [
         "neubond-web-portal@1.0.0|@cyclonedx/cyclonedx-npm@6.0.1",
+        "neubond-web-portal@1.0.0|@emnapi/core@1.10.0",
+        "neubond-web-portal@1.0.0|@emnapi/runtime@1.11.3",
+        "neubond-web-portal@1.0.0|@emnapi/wasi-threads@1.2.1",
+        "neubond-web-portal@1.0.0|@img/sharp-wasm32@0.35.3",
+        "neubond-web-portal@1.0.0|@napi-rs/wasm-runtime@1.2.3",
         "neubond-web-portal@1.0.0|@opennextjs/cloudflare@1.20.2",
         "neubond-web-portal@1.0.0|@radix-ui/react-checkbox@1.3.11",
         "neubond-web-portal@1.0.0|@radix-ui/react-dropdown-menu@2.1.24",
@@ -55477,6 +55929,7 @@
         "neubond-web-portal@1.0.0|@supabase/ssr@0.12.4",
         "neubond-web-portal@1.0.0|@supabase/supabase-js@2.112.3",
         "neubond-web-portal@1.0.0|@tailwindcss/postcss@4.3.3",
+        "neubond-web-portal@1.0.0|@tybys/wasm-util@0.10.3",
         "neubond-web-portal@1.0.0|@types/node@26.2.0",
         "neubond-web-portal@1.0.0|@types/react-dom@19.2.4",
         "neubond-web-portal@1.0.0|@types/react@19.2.18",
@@ -55515,6 +55968,39 @@
         "neubond-web-portal@1.0.0|packageurl-js@2.0.1",
         "neubond-web-portal@1.0.0|spdx-expression-parse@4.0.0",
         "neubond-web-portal@1.0.0|xmlbuilder2@4.0.3"
+      ]
+    },
+    {
+      "ref": "neubond-web-portal@1.0.0|@emnapi/core@1.10.0",
+      "dependsOn": [
+        "neubond-web-portal@1.0.0|@emnapi/wasi-threads@1.2.1",
+        "neubond-web-portal@1.0.0|tslib@2.8.1"
+      ]
+    },
+    {
+      "ref": "neubond-web-portal@1.0.0|@emnapi/runtime@1.11.3",
+      "dependsOn": [
+        "neubond-web-portal@1.0.0|tslib@2.8.1"
+      ]
+    },
+    {
+      "ref": "neubond-web-portal@1.0.0|@emnapi/wasi-threads@1.2.1",
+      "dependsOn": [
+        "neubond-web-portal@1.0.0|tslib@2.8.1"
+      ]
+    },
+    {
+      "ref": "neubond-web-portal@1.0.0|@img/sharp-wasm32@0.35.3",
+      "dependsOn": [
+        "neubond-web-portal@1.0.0|@emnapi/runtime@1.11.3"
+      ]
+    },
+    {
+      "ref": "neubond-web-portal@1.0.0|@napi-rs/wasm-runtime@1.2.3",
+      "dependsOn": [
+        "neubond-web-portal@1.0.0|@emnapi/core@1.10.0",
+        "neubond-web-portal@1.0.0|@emnapi/runtime@1.11.3",
+        "neubond-web-portal@1.0.0|@tybys/wasm-util@0.10.3"
       ]
     },
     {
@@ -55609,6 +56095,12 @@
         "neubond-web-portal@1.0.0|@tailwindcss/oxide@4.3.3",
         "neubond-web-portal@1.0.0|postcss@8.5.26",
         "neubond-web-portal@1.0.0|tailwindcss@4.3.3"
+      ]
+    },
+    {
+      "ref": "neubond-web-portal@1.0.0|@tybys/wasm-util@0.10.3",
+      "dependsOn": [
+        "neubond-web-portal@1.0.0|tslib@2.8.1"
       ]
     },
     {
@@ -56068,6 +56560,9 @@
         "neubond-web-portal@1.0.0|@oozcitak/util@10.0.0",
         "neubond-web-portal@1.0.0|js-yaml@4.3.1"
       ]
+    },
+    {
+      "ref": "neubond-web-portal@1.0.0|tslib@2.8.1"
     },
     {
       "ref": "neubond-web-portal@1.0.0|@ast-grep/napi@0.40.5",
@@ -57540,11 +58035,18 @@
       "ref": "neubond-web-portal@1.0.0|miniflare@5.20260811.1-alpha",
       "dependsOn": [
         "neubond-web-portal@1.0.0|@cspotcode/source-map-support@0.8.1",
+        "neubond-web-portal@1.0.0|miniflare@5.20260811.1-alpha|@img/sharp-wasm32@0.35.2",
         "neubond-web-portal@1.0.0|miniflare@5.20260811.1-alpha|sharp@0.35.2",
         "neubond-web-portal@1.0.0|undici@7.29.0",
         "neubond-web-portal@1.0.0|workerd@1.20260811.1",
         "neubond-web-portal@1.0.0|miniflare@5.20260811.1-alpha|ws@8.21.0",
         "neubond-web-portal@1.0.0|youch@4.1.0-beta.10"
+      ]
+    },
+    {
+      "ref": "neubond-web-portal@1.0.0|miniflare@5.20260811.1-alpha|@img/sharp-wasm32@0.35.2",
+      "dependsOn": [
+        "neubond-web-portal@1.0.0|@emnapi/runtime@1.11.3"
       ]
     },
     {
@@ -58270,9 +58772,6 @@
         "neubond-web-portal@1.0.0|use-callback-ref@1.3.3",
         "neubond-web-portal@1.0.0|use-sidecar@1.1.3"
       ]
-    },
-    {
-      "ref": "neubond-web-portal@1.0.0|tslib@2.8.1"
     },
     {
       "ref": "neubond-web-portal@1.0.0|@supabase/phoenix@0.4.5"
