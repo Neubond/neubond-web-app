@@ -1,0 +1,20 @@
+---
+description: Draft a commit message from uncommitted files when the user says "commit message", "write commit message", "generate commit message", or runs /commit-message
+alwaysApply: false
+---
+
+# Commit message (Neubond)
+
+When the user asks for a **commit message**, **write commit message**, **generate commit message**, or runs **`/commit-message`**:
+
+Follow `.cursor/commands/commit-message.md` in full.
+
+Key points:
+
+- Inspect uncommitted work: tracked diffs (`git diff` / staged) **and** untracked paths (`git status`); skim new-file contents when drafting
+- Only say nothing to commit when both tracked changes and relevant untracked paths are absent
+- Reply with **only** a markdown fenced code block; one concise primary `<type>: <summary>` line inside it
+- If multiple distinct themes, add further `<type>: <summary>` lines inside the same block (one per line, no labels)
+- Do **not** print bare chat text, `commit message`, `description`, `none`, or `-`
+- Do **not** create a git commit unless the user explicitly asks to commit
+- Do not mention secrets (`.env` values, tokens, DSN secrets)

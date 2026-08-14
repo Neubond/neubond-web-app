@@ -1,0 +1,99 @@
+name: 📄 Documentation
+description: Request documentation to be written or corrected
+title: "[DOCUMENTATION] "
+labels: ["documentation", "todo"]
+assignees: []
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Documentation Request
+      description: Describe what needs documenting
+    validations:
+      required: true
+
+  - type: textarea
+    id: audience
+    attributes:
+      label: Target Audience
+      description: Who reads this, such as engineering or clinical
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References / Links
+      description: Existing docs, tickets, or specs
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Remarks
+      description: Any additional information
+    validations:
+      required: false
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Source of Feedback
+      description: Where was the feedback sourced from and when?
+    validations:
+      required: true
+
+  - type: textarea
+    id: version
+    attributes:
+      label: App version
+      description: The `version` field in `package.json` at time of feedback
+    validations:
+      required: true
+
+  - type: dropdown
+    id: target
+    attributes:
+      label: Deployment target(s)
+      description: Which deployment does this apply to?
+      multiple: true
+      options:
+        - target-cloudflare
+        - target-vercel
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How critical is this?
+      multiple: false
+      options:
+        - priority-low
+        - priority-medium
+        - priority-high
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area(s)
+      description: Select one or more affected areas
+      multiple: true
+      options:
+        - auth
+        - ifu
+        - emails
+        - supabase
+        - ui
+        - routing
+        - storage
+        - deployment
+        - seo
+        - app-wide
+    validations:
+      required: true

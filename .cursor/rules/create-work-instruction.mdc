@@ -1,0 +1,27 @@
+---
+description: Draft Neubond Loop I Work Instructions when the user says "create work instruction" or similar
+alwaysApply: false
+---
+
+# Create work instruction (Neubond)
+
+> **Scope note:** This rule is inherited from `Neubond-App-v2` and describes the Loop I device,
+> firmware, and Flutter app QMS. Its paths (`docs/qms/`, `lib/`, `ios/`, `west.yml`) refer to those
+> repositories, not this web app. Kept here for when the web app enters IEC 62304 scope.
+
+When the user asks to **create work instruction**, **create wi**, **draft work instruction**, **write work instruction**, or similar:
+
+Follow `.cursor/commands/create-work-instruction.md` in full.
+
+Key points:
+
+- Canonical template: `docs/qms/Templates/work_instruction_template.md`
+- Cursor command: `.cursor/commands/create-work-instruction.md`
+- Human guide: `docs/ops_guide/work_instruction_generation.md`
+- Two procedure formats: **manufacturing** (parts + tools) vs **software / operations** (inputs + verification)
+- Imperative steps with **Step N** / **N-M** numbering; **IQC:** blocks after inspectable steps
+- Manufacturing parts: `NAME (LP1-XXX)` with `x1` / `2x` quantities
+- Draft output: `docs/qms/work_instructions/<wi-number>_<slug>.md`
+- Ops guides (`docs/ops_guide/`) are drafting inputs — approved WIs cite **NBD-LP1-*** controlled docs, not ops paths
+- Respect **draft only** — chat output, no file write
+- Do not commit unless explicitly asked
