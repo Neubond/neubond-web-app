@@ -15,6 +15,7 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 
@@ -57,6 +58,13 @@ const runAllowFail = (cmd, args) => {
     return err.stdout ?? "";
   }
 };
+
+/**
+ * Branch this SBOM describes. CI checkouts are frequently detached, where
+ * `rev-parse --abbrev-ref HEAD` returns "HEAD", so prefer the ref GitHub reports.
+ */
+const branchName = () =>
+  process.env.GITHUB_REF_NAME || git("rev-parse", "--abbrev-ref", "HEAD");
 
 const git = (...args) => {
   try {
@@ -174,7 +182,7 @@ console.log(`  product     ${PRODUCT_NAME}`);
 console.log(`  npm package ${pkg.name}@${pkg.version}`);
 console.log(`  scope       ${omitDev ? "production dependencies only" : "all dependencies (prod + dev)"}`);
 console.log(`  node        ${process.version}`);
-console.log(`  commit      ${git("rev-parse", "HEAD")} (${git("rev-parse", "--abbrev-ref", "HEAD")})`);
+console.log(`  commit      ${git("rev-parse", "HEAD")} (${branchName()})`);
 console.log();
 
 // 1. CycloneDX SBOM ----------------------------------------------------------
@@ -220,10 +228,11 @@ sbom.metadata.properties = [
   { name: "neubond:sbom:generator", value: "scripts/sbom/generate.mjs" },
   { name: "neubond:sbom:npmPackage", value: `${pkg.name}@${pkg.version}` },
   { name: "neubond:sbom:commit", value: git("rev-parse", "HEAD") },
-  { name: "neubond:sbom:branch", value: git("rev-parse", "--abbrev-ref", "HEAD") },
+  { name: "neubond:sbom:branch", value: branchName() },
   { name: "neubond:sbom:scope", value: omitDev ? "production" : "all" },
   { name: "neubond:sbom:node", value: process.version },
   { name: "neubond:sbom:manufacturerCoverage", value: `${resolved}/${sbom.components.length}` },
+
 ];
 
 // 3. Schema validation -------------------------------------------------------
@@ -284,14 +293,21 @@ const findings = Object.entries(audit.vulnerabilities ?? {}).map(([name, v]) => 
   fixAvailable: v.fixAvailable,
 }));
 
+const contentDigest = createHash("sha256")
+  .update(sbom.components.map((c) => c.purl).sort().join("\n"))
+  .update("|")
+  .update(JSON.stringify(counts))
+  .digest("hex");
+
 const report = {
   schema: "neubond.vulnerability-report/1",
+  contentDigest,
   generatedAt: stamp,
   component: { name: PRODUCT_NAME, npmPackage: pkg.name, version: pkg.version },
   scope: omitDev ? "production" : "all",
   provenance: {
     commit: git("rev-parse", "HEAD"),
-    branch: git("rev-parse", "--abbrev-ref", "HEAD"),
+    branch: branchName(),
     node: process.version,
     advisorySource: "npm audit (GitHub Advisory Database)",
   },
