@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Generate the SBOM and vulnerability report for the Neubond web app.
+ * Generate the SBOM and vulnerability report for the Neubond Web Portal.
  *
  * Produces engineering evidence that feeds the controlled QMS records
  * NBD-LP1-SBOM-001 and NBD-LP1-SOUP-001, which live in the QMS repository.
@@ -19,6 +19,13 @@ import { join } from "node:path";
 
 const SEVERITIES = ["info", "low", "moderate", "high", "critical"];
 const SPEC_VERSION = "1.6";
+
+/**
+ * Product name as it appears in the regulated record. The npm `name` in package.json
+ * must stay a valid npm identifier (lowercase, no spaces), so the two differ by design
+ * and both are recorded in the SBOM.
+ */
+const PRODUCT_NAME = "Neubond Web Portal";
 
 // ---------------------------------------------------------------- arguments
 
@@ -139,10 +146,11 @@ if (!pkg.name) {
 const stamp = new Date().toISOString();
 const day = stamp.slice(0, 10);
 const suffix = omitDev ? "-prod" : "";
-const outDir = val("--out", join("docs", "sbom", `v${pkg.version}_${day}${suffix}`));
+const outDir = val("--out", join("sbom", `v${pkg.version}_${day}${suffix}`));
 
-console.log(`Neubond web app SBOM and vulnerability report`);
-console.log(`  package     ${pkg.name}@${pkg.version}`);
+console.log(`${PRODUCT_NAME} SBOM and vulnerability report`);
+console.log(`  product     ${PRODUCT_NAME}`);
+console.log(`  npm package ${pkg.name}@${pkg.version}`);
 console.log(`  scope       ${omitDev ? "production dependencies only" : "all dependencies (prod + dev)"}`);
 console.log(`  node        ${process.version}`);
 console.log(`  commit      ${git("rev-parse", "HEAD")} (${git("rev-parse", "--abbrev-ref", "HEAD")})`);
@@ -159,6 +167,8 @@ if (omitDev) sbomArgs.push("--omit", "dev");
 
 process.stdout.write("Generating CycloneDX SBOM ... ");
 const sbom = JSON.parse(run("npx", sbomArgs));
+// CycloneDX takes the name from package.json; the regulated record names the product.
+sbom.metadata.component.name = PRODUCT_NAME;
 console.log(`${sbom.components.length} components`);
 
 // 2. Manufacturer enrichment -------------------------------------------------
@@ -187,6 +197,7 @@ for (const [source, count] of Object.entries(bySource)) console.log(`    via ${s
 sbom.metadata.properties = [
   ...(sbom.metadata.properties ?? []),
   { name: "neubond:sbom:generator", value: "scripts/sbom/generate.mjs" },
+  { name: "neubond:sbom:npmPackage", value: `${pkg.name}@${pkg.version}` },
   { name: "neubond:sbom:commit", value: git("rev-parse", "HEAD") },
   { name: "neubond:sbom:branch", value: git("rev-parse", "--abbrev-ref", "HEAD") },
   { name: "neubond:sbom:scope", value: omitDev ? "production" : "all" },
@@ -248,7 +259,7 @@ const findings = Object.entries(audit.vulnerabilities ?? {}).map(([name, v]) => 
 const report = {
   schema: "neubond.vulnerability-report/1",
   generatedAt: stamp,
-  component: { name: pkg.name, version: pkg.version },
+  component: { name: PRODUCT_NAME, npmPackage: pkg.name, version: pkg.version },
   scope: omitDev ? "production" : "all",
   provenance: {
     commit: git("rev-parse", "HEAD"),
@@ -269,9 +280,10 @@ const severityLine = SEVERITIES
   .map((s) => `${s}: ${counts[s] ?? 0}`)
   .join(" · ");
 
-const md = `# Vulnerability report — ${pkg.name} ${pkg.version}
+const md = `# Vulnerability report — ${PRODUCT_NAME} ${pkg.version}
 
 **Generated:** ${stamp}
+**npm package:** \`${pkg.name}@${pkg.version}\`
 **Scope:** ${omitDev ? "Production dependencies only" : "All dependencies (production and development)"}
 **Commit:** \`${report.provenance.commit}\` (\`${report.provenance.branch}\`)
 **Node:** ${process.version}

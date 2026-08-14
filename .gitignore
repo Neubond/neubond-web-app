@@ -54,6 +54,3 @@ next-env.d.ts
 # local admin scripts (invoked with service-role credentials)
 scripts/admin-reset-password.mjs
 
-# sbom: dated snapshots are reproducible from the lockfile and kept as CI
-# artifacts. The baseline sbom.json at the repo root stays tracked.
-docs/sbom/**/sbom.json
