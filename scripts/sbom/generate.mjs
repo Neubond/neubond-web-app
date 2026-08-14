@@ -15,7 +15,8 @@
 
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
 
 const SEVERITIES = ["info", "low", "moderate", "high", "critical"];
 const SPEC_VERSION = "1.6";
@@ -135,6 +136,26 @@ function indexInstalledPackages() {
   return index;
 }
 
+
+/**
+ * Locate the CycloneDX schema directory. npm hoists @cyclonedx/cyclonedx-library to the
+ * top level on one branch and nests it under cyclonedx-npm on the other, so the path is
+ * resolved rather than assumed. Returns null when it genuinely cannot be found.
+ */
+function findSchemaDir() {
+  const require_ = createRequire(import.meta.url);
+  try {
+    return join(dirname(require_.resolve("@cyclonedx/cyclonedx-library/package.json")), "res", "schema");
+  } catch {
+    /* not resolvable via exports map, fall through to known layouts */
+  }
+  const candidates = [
+    "node_modules/@cyclonedx/cyclonedx-library/res/schema",
+    "node_modules/@cyclonedx/cyclonedx-npm/node_modules/@cyclonedx/cyclonedx-library/res/schema",
+  ];
+  return candidates.find((c) => existsSync(join(c, "bom-1.6.SNAPSHOT.schema.json"))) ?? null;
+}
+
 // ------------------------------------------------------------------ generate
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
@@ -207,19 +228,28 @@ sbom.metadata.properties = [
 
 // 3. Schema validation -------------------------------------------------------
 process.stdout.write("Validating against CycloneDX 1.6 schema ... ");
-let validationResult = "skipped (validator unavailable)";
-try {
+let validationResult;
+const schemaDir = findSchemaDir();
+if (!schemaDir) {
+  // Validation is a compliance control. Silently skipping it once already hid a real
+  // failure, so an unavailable validator is an error unless explicitly waived.
+  console.log("UNAVAILABLE");
+  console.error(
+    "\nCannot locate the CycloneDX schema. The SBOM has not been validated.\n" +
+      "Run `npm ci` first, or pass --allow-unvalidated to accept an unvalidated document.",
+  );
+  if (!has("--allow-unvalidated")) process.exit(1);
+  validationResult = "NOT VALIDATED (waived via --allow-unvalidated)";
+} else {
   const { default: Ajv } = await import("ajv");
-  const schemaPath =
-    "node_modules/@cyclonedx/cyclonedx-library/res/schema/bom-1.6.SNAPSHOT.schema.json";
-  const schema = JSON.parse(readFileSync(schemaPath, "utf8"));
+  const schema = JSON.parse(readFileSync(join(schemaDir, "bom-1.6.SNAPSHOT.schema.json"), "utf8"));
   const ajv = new Ajv({ strict: false, validateFormats: false, allowUnionTypes: true });
   // The bundled schemas $ref each other by filename, but declare $id as a URL, so
   // register the siblings under the URL those relative refs actually resolve to.
   for (const ref of ["spdx.SNAPSHOT.schema.json", "jsf-0.82.SNAPSHOT.schema.json"]) {
-    const p = `node_modules/@cyclonedx/cyclonedx-library/res/schema/${ref}`;
-    if (!existsSync(p)) continue;
-    const sibling = JSON.parse(readFileSync(p, "utf8"));
+    const sibPath = join(schemaDir, ref);
+    if (!existsSync(sibPath)) continue;
+    const sibling = JSON.parse(readFileSync(sibPath, "utf8"));
     delete sibling.$id;
     ajv.addSchema(sibling, `http://cyclonedx.org/schema/${ref}`);
   }
@@ -231,10 +261,8 @@ try {
     validationResult = `INVALID: ${validate.errors?.length} error(s)`;
     console.log(validationResult);
     console.error(JSON.stringify(validate.errors?.slice(0, 5), null, 2));
-    process.exitCode = 1;
+    process.exit(1);
   }
-} catch (err) {
-  console.log(`skipped (${err.message})`);
 }
 
 // 4. Vulnerability report ----------------------------------------------------
